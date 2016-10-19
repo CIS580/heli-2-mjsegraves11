@@ -3,6 +3,7 @@
 /* Classes */
 const Game = require('./game');
 const Vector = require('./vector');
+const BulletPool = require('./bullet_pool');
 
 /* Global variables */
 var canvas = document.getElementById('screen');
@@ -39,6 +40,7 @@ var reticule = {
   x: 0,
   y: 0
 }
+var bullets = new BulletPool(10);
 
 /**
  * @function onmousemove
@@ -59,6 +61,7 @@ window.onmousedown = function(event) {
   reticule.x = event.offsetX;
   reticule.y = event.offsetY;
   // TODO: Fire bullet in direction of the retciule
+  bullets.add(player.position, {x:1, y:0});
 }
 
 /**
@@ -184,6 +187,9 @@ function update(elapsedTime) {
 
   if(camera.x < 0) camera.x = 0;
 
+  bullets.update(elapsedTime, function(bullet){
+    return false;
+  });
 }
 
 /**
@@ -209,6 +215,8 @@ function render(elapsedTime, ctx) {
   ctx.translate(-camera.x, 0);
   ctx.drawImage(backgrounds[0], 0, 0);
   ctx.restore();
+
+  bullets.render();
 
   // Render the player
   ctx.save();
